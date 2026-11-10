@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { DPad, RemoteButton, Rocker } from '@/components/remote';
+import { RemotePanel } from '@/components/remote';
 import { ThemedText } from '@/components/themed-text';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -12,7 +12,7 @@ import { type RemoteKey } from '@/protocols/keys';
 
 /**
  * Vista previa del mando sin tele conectada. Muestra la última tecla y un
- * contador: así se puede comprobar ya que un toque cuenta una sola vez.
+ * contador: así se puede comprobar que un toque cuenta una sola vez.
  */
 export default function RemoteDemoScreen() {
   const t = useTranslations();
@@ -25,8 +25,6 @@ export default function RemoteDemoScreen() {
     setCount((value) => value + 1);
   };
 
-  const keys = t.remote.keys;
-
   return (
     <>
       <Stack.Screen options={{ title: t.remote.title }} />
@@ -38,58 +36,20 @@ export default function RemoteDemoScreen() {
           </ThemedText>
         </View>
 
-        {/* Pantallita con la última tecla: VoiceOver la anuncia al cambiar */}
         <View
           accessibilityLiveRegion="polite"
           style={[styles.display, { backgroundColor: theme.surface, borderColor: theme.border }]}>
           <ThemedText type="defaultBold">
-            {lastKey ? format(t.remote.lastKey, { key: keys[lastKey] }) : t.remote.noKeyYet}
+            {lastKey
+              ? format(t.remote.lastKey, { key: t.remote.keys[lastKey] })
+              : t.remote.noKeyYet}
           </ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
             {format(t.remote.pressCount, { count: String(count) })}
           </ThemedText>
         </View>
 
-        <View style={styles.topRow}>
-          <RemoteButton icon="menu" label={keys.menu} remoteKey="menu" onKey={onKey} />
-          <RemoteButton
-            icon="power"
-            label={keys.power}
-            remoteKey="power"
-            onKey={onKey}
-            tone="danger"
-          />
-        </View>
-
-        <DPad
-          onKey={onKey}
-          labels={{ up: keys.up, down: keys.down, left: keys.left, right: keys.right, ok: keys.ok }}
-        />
-
-        <View style={styles.navRow}>
-          <RemoteButton icon="arrow-undo" label={keys.back} remoteKey="back" onKey={onKey} />
-          <RemoteButton icon="home" label={keys.home} remoteKey="home" onKey={onKey} />
-          <RemoteButton icon="volume-mute" label={keys.mute} remoteKey="mute" onKey={onKey} />
-        </View>
-
-        <View style={styles.rockers}>
-          <Rocker
-            title={t.remote.volume}
-            upKey="volumeUp"
-            downKey="volumeDown"
-            upLabel={keys.volumeUp}
-            downLabel={keys.volumeDown}
-            onKey={onKey}
-          />
-          <Rocker
-            title={t.remote.channel}
-            upKey="channelUp"
-            downKey="channelDown"
-            upLabel={keys.channelUp}
-            downLabel={keys.channelDown}
-            onKey={onKey}
-          />
-        </View>
+        <RemotePanel onKey={onKey} t={t} />
       </ScrollView>
     </>
   );
@@ -117,18 +77,5 @@ const styles = StyleSheet.create({
     borderRadius: Radius.medium,
     borderWidth: StyleSheet.hairlineWidth,
     gap: 2,
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.two,
-  },
-  navRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-  },
-  rockers: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
   },
 });

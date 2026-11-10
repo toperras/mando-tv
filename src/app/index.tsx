@@ -1,8 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -17,11 +18,21 @@ import {
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { format, useTranslations } from '@/i18n';
+import { type SavedTv } from '@/protocols/types';
+import { loadSavedTvs } from '@/storage/tvs';
 
 export default function HomeScreen() {
   const t = useTranslations();
   const theme = useTheme();
   const version = Constants.expoConfig?.version ?? '?';
+  const [savedTv, setSavedTv] = useState<SavedTv | null>(null);
+
+  // Se recarga cada vez que se vuelve a Inicio (por ejemplo, tras guardar u olvidar una tele).
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedTvs().then((tvs) => setSavedTv(tvs[0] ?? null));
+    }, [])
+  );
 
   const showComingSoon = (message: string) =>
     Alert.alert(t.common.comingSoonTitle, message, [{ text: t.common.ok }]);
@@ -59,25 +70,46 @@ export default function HomeScreen() {
           </ThemedText>
           <ThemedText style={styles.heroSubtitle}>{t.home.heroSubtitle}</ThemedText>
           <HeroButton
-            icon="search"
-            label={t.home.findTv}
-            onPress={() => showComingSoon(t.home.findTvSoon)}
+            icon={savedTv ? 'game-controller' : 'search'}
+            label={savedTv ? t.home.openRemote : t.home.findTv}
+            onPress={() => router.push(savedTv ? '/remote' : '/add-tv')}
           />
         </LinearGradient>
 
         {/* Teles guardadas */}
         <SectionTitle>{t.home.myTvs}</SectionTitle>
-        <Card style={styles.emptyCard}>
-          <View style={[styles.emptyIcon, { backgroundColor: theme.surfaceRaised }]}>
-            <Ionicons name="tv-outline" size={28} color={theme.textSecondary} />
-          </View>
-          <View style={styles.emptyText}>
-            <ThemedText type="defaultBold">{t.home.noTvsTitle}</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">
-              {t.home.noTvsBody}
-            </ThemedText>
-          </View>
-        </Card>
+        {savedTv ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`${savedTv.name}. ${t.home.openRemote}`}
+            onPress={() => router.push('/remote')}
+            style={({ pressed }) => [{ transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+            <Card style={styles.emptyCard}>
+              <View style={[styles.emptyIcon, { backgroundColor: theme.accentSoft }]}>
+                <Ionicons name="tv" size={28} color={theme.accent} />
+              </View>
+              <View style={styles.emptyText}>
+                <ThemedText type="defaultBold">{savedTv.name}</ThemedText>
+                <ThemedText type="small" themeColor="textSecondary">
+                  {format(t.home.tvAddress, { ip: savedTv.ip })}
+                </ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={theme.textSecondary} />
+            </Card>
+          </Pressable>
+        ) : (
+          <Card style={styles.emptyCard}>
+            <View style={[styles.emptyIcon, { backgroundColor: theme.surfaceRaised }]}>
+              <Ionicons name="tv-outline" size={28} color={theme.textSecondary} />
+            </View>
+            <View style={styles.emptyText}>
+              <ThemedText type="defaultBold">{t.home.noTvsTitle}</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                {t.home.noTvsBody}
+              </ThemedText>
+            </View>
+          </Card>
+        )}
 
         {/* Otras acciones */}
         <SectionTitle>{t.home.more}</SectionTitle>
