@@ -39,9 +39,26 @@ fun classifyError(error: Throwable): ConnectionError = when (error) {
  * causas, para no afirmar cosas que no sabemos.
  */
 @Composable
-fun ErrorExplanation(error: ConnectionError, host: String, detail: String?, extraCause: String? = null) {
+fun ErrorExplanation(
+    error: ConnectionError,
+    host: String,
+    detail: String?,
+    extraCause: String? = null,
+    /** true si es una tele ya emparejada: sabemos que es compatible, así que no lo ponemos en duda. */
+    knownTv: Boolean = false,
+) {
     val colors = MaterialTheme.colorScheme
-    val (observed, causes) = when (error) {
+    val noAnswer = error == ConnectionError.UNREACHABLE || error == ConnectionError.TIMEOUT
+    val (observed, causes) = when {
+        knownTv && noAnswer -> stringResource(R.string.error_known_tv_no_answer) to stringResource(R.string.error_known_tv_no_answer_causes)
+        else -> genericTexts(error, host, detail)
+    }
+    ErrorCard(observed, listOfNotNull(extraCause, causes).joinToString("\n"))
+}
+
+@Composable
+private fun genericTexts(error: ConnectionError, host: String, detail: String?): Pair<String, String> =
+    when (error) {
         ConnectionError.UNREACHABLE -> stringResource(R.string.error_unreachable, host) to stringResource(R.string.error_unreachable_causes)
         ConnectionError.TIMEOUT -> stringResource(R.string.error_timeout, host) to stringResource(R.string.error_timeout_causes)
         ConnectionError.REJECTED_ON_TV -> stringResource(R.string.error_rejected) to stringResource(R.string.error_rejected_causes)
@@ -50,6 +67,10 @@ fun ErrorExplanation(error: ConnectionError, host: String, detail: String?, extr
         ConnectionError.UNEXPECTED_RESPONSE -> stringResource(R.string.error_unexpected, host) to stringResource(R.string.error_unexpected_causes)
         ConnectionError.UNKNOWN -> stringResource(R.string.error_unknown, detail ?: "?") to stringResource(R.string.error_unknown_causes)
     }
+
+@Composable
+private fun ErrorCard(observed: String, causes: String) {
+    val colors = MaterialTheme.colorScheme
     AppCard {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -64,11 +85,7 @@ fun ErrorExplanation(error: ConnectionError, host: String, detail: String?, extr
                 modifier = Modifier,
             )
             // La causa más probable, si la conocemos, va primero.
-            Text(
-                listOfNotNull(extraCause, causes).joinToString("\n"),
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.onSurfaceVariant,
-            )
+            Text(causes, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
     }
 }

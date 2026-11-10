@@ -99,6 +99,8 @@
     <string name="error_not_paired_causes">• The TV was reset or the pairing was removed from its settings.\n• Pair again: the TV will show a new code.</string>
     <string name="error_unexpected">Something answered at %1$s, but not like an Android TV.</string>
     <string name="error_unexpected_causes">• The IP belongs to another device.\n• The TV uses a different system (Samsung, LG…), which needs another connection type.</string>
+    <string name="error_known_tv_no_answer">The TV is not answering.</string>
+    <string name="error_known_tv_no_answer_causes">• It is off or in standby (some TVs turn Wi-Fi off or slow it down when the screen is off).\n• It has a weak Wi-Fi signal, or the router keeps it apart from the phone.\n• Turn it on with its remote and tap Retry.</string>
     <string name="error_unknown">Unexpected error: %1$s</string>
     <string name="error_unknown_causes">• Try again. If it keeps failing, restart the TV.</string>
 

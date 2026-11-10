@@ -117,7 +117,7 @@ fun RemoteScreen(tvId: String, onRepair: (host: String, name: String) -> Unit, o
                             modifier = Modifier.fillMaxWidth(),
                         )
                     } else if (failed != null) {
-                        ErrorExplanation(failed.error, current.host, failed.detail)
+                        ErrorExplanation(failed.error, current.host, failed.detail, knownTv = true)
                         if (failed.error == ConnectionError.NOT_PAIRED) {
                             PrimaryButton(
                                 text = stringResource(R.string.remote_repair),

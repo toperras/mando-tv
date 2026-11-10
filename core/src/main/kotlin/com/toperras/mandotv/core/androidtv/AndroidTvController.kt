@@ -180,7 +180,9 @@ class AndroidTvController(
 
     companion object {
         const val REMOTE_PORT = 6466
-        private const val CONNECT_TIMEOUT_MS = 5_000
+        // Teles lentas (Mi TV 4A con Android 9) pueden tardar varios segundos en el
+        // handshake TLS con certificado de cliente, sobre todo recién despertadas.
+        private const val CONNECT_TIMEOUT_MS = 12_000
         private const val READ_TIMEOUT_MS = 20_000
 
         private const val FIELD_CONFIGURE = 1

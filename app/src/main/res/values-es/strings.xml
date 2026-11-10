@@ -98,6 +98,8 @@
     <string name="error_not_paired_causes">• La tele se ha restablecido o se borró el emparejamiento en sus ajustes.\n• Vuelve a emparejar: la tele mostrará un código nuevo.</string>
     <string name="error_unexpected">Algo ha respondido en %1$s, pero no como una Android TV.</string>
     <string name="error_unexpected_causes">• La IP es de otro aparato.\n• La tele usa otro sistema (Samsung, LG…), que necesita otro tipo de conexión.</string>
+    <string name="error_known_tv_no_answer">La tele no responde.</string>
+    <string name="error_known_tv_no_answer_causes">• Está apagada o en reposo (algunas teles apagan o ralentizan la wifi cuando la pantalla está apagada).\n• Tiene mala señal wifi o el router la separa del móvil.\n• Enciéndela con su mando y pulsa Reintentar.</string>
     <string name="error_unknown">Error inesperado: %1$s</string>
     <string name="error_unknown_causes">• Vuelve a intentarlo. Si sigue fallando, reinicia la tele.</string>
 
