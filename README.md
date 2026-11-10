@@ -29,8 +29,14 @@ modules/          Módulos nativos locales (Kotlin/Swift)
 | Servidor de desarrollo (development build) | `npx expo start` |
 | Servidor de desarrollo (Expo Go) | `npx expo start --go` |
 | Si el móvil no conecta | añadir `--tunnel` |
-| Build de desarrollo Android | `npx eas-cli@latest build --profile development --platform android` |
-| Build de desarrollo iOS | `npx eas-cli@latest build --profile development --platform ios` |
+| Build de desarrollo Android | `npm run eas -- build --profile development --platform android` |
+| Build de desarrollo iOS | `npm run eas -- build --profile development --platform ios` |
+
+### Token de Expo
+
+`npm run eas -- <orden>` lee `EXPO_TOKEN` de `.env.local` (Git lo ignora). Para configurarlo,
+copia `.env.local.example` como `.env.local` y pega tu token, que se crea en
+expo.dev → Account settings → Access tokens.
 
 ## Perfiles de EAS (`eas.json`)
 
