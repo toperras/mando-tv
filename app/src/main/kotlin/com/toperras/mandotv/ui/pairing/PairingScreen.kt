@@ -46,20 +46,28 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toperras.mandotv.R
+import com.toperras.mandotv.core.ConnectionError
 import com.toperras.mandotv.ui.components.BackTopBar
 import com.toperras.mandotv.ui.components.ErrorExplanation
 import com.toperras.mandotv.ui.components.PrimaryButton
 import com.toperras.mandotv.ui.components.ScreenColumn
 
 @Composable
-fun PairingScreen(host: String, name: String, onPaired: () -> Unit, onBack: () -> Unit) {
+fun PairingScreen(
+    host: String,
+    name: String,
+    /** true si la tele apareció en la búsqueda (se anuncia en la red). */
+    foundByDiscovery: Boolean,
+    onPaired: (tvId: String) -> Unit,
+    onBack: () -> Unit,
+) {
     val application = LocalContext.current.applicationContext as Application
     val vm: PairingViewModel = viewModel(key = "pair-$host") { PairingViewModel(application, host, name) }
     val state by vm.state.collectAsStateWithLifecycle()
     val colors = MaterialTheme.colorScheme
 
     LaunchedEffect(state) {
-        if (state == PairingUiState.Paired) onPaired()
+        (state as? PairingUiState.Paired)?.let { onPaired(it.tvId) }
     }
 
     Scaffold(
@@ -75,7 +83,7 @@ fun PairingScreen(host: String, name: String, onPaired: () -> Unit, onBack: () -
         ) {
             ScreenColumn(Modifier.padding(top = 8.dp, bottom = 48.dp)) {
                 when (val current = state) {
-                    PairingUiState.Connecting, PairingUiState.Paired -> {
+                    PairingUiState.Connecting, is PairingUiState.Paired -> {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(22.dp))
                             Text(stringResource(R.string.pair_connecting, name), style = MaterialTheme.typography.titleMedium)
@@ -90,7 +98,16 @@ fun PairingScreen(host: String, name: String, onPaired: () -> Unit, onBack: () -
 
                     is PairingUiState.Failed -> {
                         Text(stringResource(R.string.pair_failed_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                        ErrorExplanation(current.error, host, current.detail)
+                        // Si la tele se anuncia en la red pero no acepta la conexión, lo más
+                        // probable es que el router aísle los aparatos wifi o estén en redes distintas.
+                        val announcedButUnreachable = foundByDiscovery &&
+                            (current.error == ConnectionError.UNREACHABLE || current.error == ConnectionError.TIMEOUT)
+                        ErrorExplanation(
+                            current.error,
+                            host,
+                            current.detail,
+                            extraCause = if (announcedButUnreachable) stringResource(R.string.error_isolation_cause) else null,
+                        )
                         PrimaryButton(text = stringResource(R.string.pair_retry), icon = Icons.Filled.Refresh, onClick = vm::start)
                     }
                 }

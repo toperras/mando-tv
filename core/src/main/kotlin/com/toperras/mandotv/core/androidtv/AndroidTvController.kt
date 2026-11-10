@@ -61,6 +61,15 @@ class AndroidTvController(
     private val _state = MutableStateFlow<ConnectionState>(ConnectionState.Idle)
     override val state: StateFlow<ConnectionState> = _state.asStateFlow()
 
+    /**
+     * Lo que el aparato dice de su volumen al conectar: true si tiene un control
+     * de volumen propio, false si no informa de ninguno (p. ej. Google TV Streamer
+     * o Chromecast, donde el volumen lo lleva la tele por IR o HDMI-CEC), null si
+     * aún no lo sabemos.
+     */
+    private val _volumeControl = MutableStateFlow<Boolean?>(null)
+    val volumeControl: StateFlow<Boolean?> = _volumeControl.asStateFlow()
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var connection: TlsConnection? = null
     private var readerJob: Job? = null
@@ -96,7 +105,9 @@ class AndroidTvController(
         try {
             while (isActive) {
                 val message = ProtoMessage.parse(conn.receive())
-                if (!message.has(FIELD_PING_REQUEST)) log("← campos ${message.fieldNumbers}", null)
+                if (!message.has(FIELD_PING_REQUEST)) {
+                    log("← campos ${message.fieldNumbers} ${describe(message)}", null)
+                }
                 when {
                     message.has(FIELD_CONFIGURE) -> conn.send(RemoteMessages.configure(deviceInfo))
                     message.has(FIELD_SET_ACTIVE) -> {
@@ -107,6 +118,10 @@ class AndroidTvController(
                         }
                         connected = true
                         _state.value = ConnectionState.Connected
+                    }
+                    message.has(FIELD_VOLUME_LEVEL) -> {
+                        val maxVolume = message.message(FIELD_VOLUME_LEVEL)?.int(6) ?: 0
+                        _volumeControl.value = maxVolume > 0
                     }
                     message.has(FIELD_PING_REQUEST) -> {
                         val value = message.message(FIELD_PING_REQUEST)?.int(1) ?: 0
@@ -143,6 +158,16 @@ class AndroidTvController(
         withContext(Dispatchers.IO) { conn.send(RemoteMessages.keyPress(code)) }
     }
 
+    /** Resumen legible de los mensajes que nos interesan para diagnosticar. */
+    private fun describe(message: ProtoMessage): String {
+        message.message(FIELD_VOLUME_LEVEL)?.let { v ->
+            return "volumen: modelo=${v.string(3)} max=${v.int(6)} nivel=${v.int(7)} silencio=${v.int(8)}"
+        }
+        message.message(FIELD_REMOTE_START)?.let { return "encendida=${it.int(1)}" }
+        message.message(FIELD_ERROR)?.let { return "error de la tele: campos ${it.fieldNumbers}" }
+        return ""
+    }
+
     private fun classify(error: Exception, connected: Boolean): ConnectionError = when (error) {
         is SocketTimeoutException -> ConnectionError.TIMEOUT
         is ConnectException, is NoRouteToHostException, is UnknownHostException -> ConnectionError.UNREACHABLE
@@ -161,6 +186,9 @@ class AndroidTvController(
         private const val FIELD_CONFIGURE = 1
         private const val FIELD_SET_ACTIVE = 2
         private const val FIELD_PING_REQUEST = 8
+        private const val FIELD_ERROR = 3
+        private const val FIELD_REMOTE_START = 40
+        private const val FIELD_VOLUME_LEVEL = 50
 
         /** Teclas del mando → códigos de tecla de Android (KeyEvent). */
         val KEY_CODES: Map<RemoteKey, Int> = mapOf(

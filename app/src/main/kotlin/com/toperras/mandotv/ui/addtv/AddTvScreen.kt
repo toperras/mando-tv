@@ -49,7 +49,7 @@ private val IP_PATTERN = Regex("^((25[0-5]|2[0-4]\\d|1?\\d?\\d)\\.){3}(25[0-5]|2
  * siempre ofrece escribir la IP a mano (por si la búsqueda falla).
  */
 @Composable
-fun AddTvScreen(onTvChosen: (host: String, name: String) -> Unit, onBack: () -> Unit) {
+fun AddTvScreen(onTvChosen: (host: String, name: String, foundByDiscovery: Boolean) -> Unit, onBack: () -> Unit) {
     val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
     val discovery = remember { TvDiscovery(context.applicationContext) }
@@ -78,7 +78,7 @@ fun AddTvScreen(onTvChosen: (host: String, name: String) -> Unit, onBack: () -> 
                         icon = Icons.Filled.Tv,
                         title = tv.name,
                         description = "${stringResource(R.string.addtv_android_tv)} · ${tv.host}",
-                        onClick = { onTvChosen(tv.host, tv.name) },
+                        onClick = { onTvChosen(tv.host, tv.name, true) },
                         iconTint = colors.primary,
                         iconBackground = colors.primaryContainer,
                     )
@@ -105,14 +105,14 @@ fun AddTvScreen(onTvChosen: (host: String, name: String) -> Unit, onBack: () -> 
                         )
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Go),
-                    keyboardActions = KeyboardActions(onGo = { if (ipValid) onTvChosen(ip.trim(), ip.trim()) }),
+                    keyboardActions = KeyboardActions(onGo = { if (ipValid) onTvChosen(ip.trim(), ip.trim(), false) }),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 PrimaryButton(
                     text = stringResource(R.string.addtv_connect),
                     icon = Icons.AutoMirrored.Filled.ArrowForward,
                     enabled = ipValid,
-                    onClick = { onTvChosen(ip.trim(), ip.trim()) },
+                    onClick = { onTvChosen(ip.trim(), ip.trim(), false) },
                 )
             }
         }

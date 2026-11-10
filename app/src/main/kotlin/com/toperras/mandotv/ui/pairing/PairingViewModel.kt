@@ -23,7 +23,7 @@ import kotlinx.coroutines.withContext
 sealed interface PairingUiState {
     data object Connecting : PairingUiState
     data class AwaitingCode(val wrongCode: Boolean = false, val submitting: Boolean = false) : PairingUiState
-    data object Paired : PairingUiState
+    data class Paired(val tvId: String) : PairingUiState
     data class Failed(val error: ConnectionError, val detail: String?) : PairingUiState
 }
 
@@ -75,7 +75,7 @@ class PairingViewModel(
                 repository.save(SavedTv(id, name, host, ProtocolId.ANDROID_TV, System.currentTimeMillis()))
                 // Huella nueva: se guardará en la primera conexión del mando.
                 repository.clearFingerprint(id)
-                _state.value = PairingUiState.Paired
+                _state.value = PairingUiState.Paired(id)
             } catch (error: WrongPinException) {
                 // La tele ha rechazado el código y cierra: hay que pedir otro.
                 _state.value = PairingUiState.Failed(ConnectionError.WRONG_PIN, error.message)

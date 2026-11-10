@@ -38,7 +38,7 @@ import kotlinx.coroutines.withContext
  * en segundo plano y se rehace sola al volver (sin pedir código otra vez).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class RemoteViewModel(application: Application) : AndroidViewModel(application) {
+class RemoteViewModel(application: Application, private val tvId: String) : AndroidViewModel(application) {
     private val repository = SavedTvRepository(application)
 
     private val _tv = MutableStateFlow<SavedTv?>(null)
@@ -57,6 +57,11 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
         .stateIn(viewModelScope, SharingStarted.Eagerly, ConnectionState.Idle)
 
     val supportedKeys: Set<RemoteKey>? get() = controller.value?.capabilities?.keys
+
+    /** false si el aparato no controla el volumen por red (ver AndroidTvController.volumeControl). */
+    val volumeControl: StateFlow<Boolean?> = controller
+        .flatMapLatest { (it as? AndroidTvController)?.volumeControl ?: flowOf(null) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     /** true mientras la app intenta recuperar sola una conexión que se cortó. */
     private val _reconnecting = MutableStateFlow(false)
@@ -117,7 +122,7 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
 
     init {
         viewModelScope.launch {
-            val saved = repository.first()
+            val saved = repository.get(tvId)
             _tv.value = saved
             if (saved != null && saved.protocol == ProtocolId.ANDROID_TV) {
                 val identity = withContext(Dispatchers.IO) { KeyStoreIdentity.getOrCreate() }

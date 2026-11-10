@@ -39,7 +39,7 @@ fun classifyError(error: Throwable): ConnectionError = when (error) {
  * causas, para no afirmar cosas que no sabemos.
  */
 @Composable
-fun ErrorExplanation(error: ConnectionError, host: String, detail: String?) {
+fun ErrorExplanation(error: ConnectionError, host: String, detail: String?, extraCause: String? = null) {
     val colors = MaterialTheme.colorScheme
     val (observed, causes) = when (error) {
         ConnectionError.UNREACHABLE -> stringResource(R.string.error_unreachable, host) to stringResource(R.string.error_unreachable_causes)
@@ -63,7 +63,12 @@ fun ErrorExplanation(error: ConnectionError, host: String, detail: String?) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier,
             )
-            Text(causes, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
+            // La causa más probable, si la conocemos, va primero.
+            Text(
+                listOfNotNull(extraCause, causes).joinToString("\n"),
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.onSurfaceVariant,
+            )
         }
     }
 }

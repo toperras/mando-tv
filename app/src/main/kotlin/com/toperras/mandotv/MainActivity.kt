@@ -45,10 +45,13 @@ private object Routes {
     const val SETTINGS = "settings"
     const val DEMO = "demo"
     const val ADD_TV = "add-tv"
-    const val PAIR = "pair?host={host}&name={name}"
-    const val REMOTE = "remote"
+    const val PAIR = "pair?host={host}&name={name}&found={found}"
+    const val REMOTE = "remote?id={id}"
 
-    fun pair(host: String, name: String) = "pair?host=${Uri.encode(host)}&name=${Uri.encode(name)}"
+    fun pair(host: String, name: String, found: Boolean) =
+        "pair?host=${Uri.encode(host)}&name=${Uri.encode(name)}&found=$found"
+
+    fun remote(id: String) = "remote?id=${Uri.encode(id)}"
 }
 
 @Composable
@@ -68,16 +71,16 @@ private fun MandoTvApp() {
             NavHost(navController = nav, startDestination = Routes.HOME) {
                 composable(Routes.HOME) {
                     HomeScreen(
-                        savedTv = tvs.firstOrNull(),
+                        savedTvs = tvs,
                         onOpenSettings = { nav.navigate(Routes.SETTINGS) },
                         onOpenDemo = { nav.navigate(Routes.DEMO) },
                         onConnectTv = { nav.navigate(Routes.ADD_TV) },
-                        onOpenRemote = { nav.navigate(Routes.REMOTE) },
+                        onOpenRemote = { id -> nav.navigate(Routes.remote(id)) },
                     )
                 }
                 composable(Routes.ADD_TV) {
                     AddTvScreen(
-                        onTvChosen = { host, name -> nav.navigate(Routes.pair(host, name)) },
+                        onTvChosen = { host, name, found -> nav.navigate(Routes.pair(host, name, found)) },
                         onBack = { nav.popBackStack() },
                     )
                 }
@@ -86,6 +89,7 @@ private fun MandoTvApp() {
                     arguments = listOf(
                         navArgument("host") { type = NavType.StringType },
                         navArgument("name") { type = NavType.StringType },
+                        navArgument("found") { type = NavType.BoolType; defaultValue = false },
                     ),
                 ) { entry ->
                     val host = entry.arguments?.getString("host").orEmpty()
@@ -93,9 +97,10 @@ private fun MandoTvApp() {
                     PairingScreen(
                         host = host,
                         name = name,
+                        foundByDiscovery = entry.arguments?.getBoolean("found") ?: false,
                         // Al emparejar, vamos al mando y quitamos de la pila las pantallas de conexión.
-                        onPaired = {
-                            nav.navigate(Routes.REMOTE) {
+                        onPaired = { id ->
+                            nav.navigate(Routes.remote(id)) {
                                 popUpTo(Routes.HOME)
                                 launchSingleTop = true
                             }
@@ -103,10 +108,14 @@ private fun MandoTvApp() {
                         onBack = { nav.popBackStack() },
                     )
                 }
-                composable(Routes.REMOTE) {
+                composable(
+                    Routes.REMOTE,
+                    arguments = listOf(navArgument("id") { type = NavType.StringType }),
+                ) { entry ->
                     RemoteScreen(
+                        tvId = entry.arguments?.getString("id").orEmpty(),
                         onRepair = { host, name ->
-                            nav.navigate(Routes.pair(host, name)) { popUpTo(Routes.HOME) }
+                            nav.navigate(Routes.pair(host, name, found = false)) { popUpTo(Routes.HOME) }
                         },
                         onBack = { nav.popBackStack() },
                     )

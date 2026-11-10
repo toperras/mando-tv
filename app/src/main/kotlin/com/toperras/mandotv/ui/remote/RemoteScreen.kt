@@ -18,6 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Info
+import com.toperras.mandotv.ui.components.AppCard
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -59,9 +61,10 @@ import com.toperras.mandotv.ui.components.label
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RemoteScreen(onRepair: (host: String, name: String) -> Unit, onBack: () -> Unit) {
+fun RemoteScreen(tvId: String, onRepair: (host: String, name: String) -> Unit, onBack: () -> Unit) {
     val application = LocalContext.current.applicationContext as Application
-    val vm: RemoteViewModel = viewModel { RemoteViewModel(application) }
+    val vm: RemoteViewModel = viewModel(key = "remote-$tvId") { RemoteViewModel(application, tvId) }
+    val volumeControl by vm.volumeControl.collectAsStateWithLifecycle()
     val tv by vm.tv.collectAsStateWithLifecycle()
     val connection by vm.connection.collectAsStateWithLifecycle()
     val failedKey by vm.failedKey.collectAsStateWithLifecycle()
@@ -138,6 +141,26 @@ fun RemoteScreen(onRepair: (host: String, name: String) -> Unit, onBack: () -> U
                         supportedKeys = vm.supportedKeys,
                         enabled = connection == ConnectionState.Connected,
                     )
+
+                    // Los botones de volumen siguen activos (algunos aparatos sí los
+                    // reenvían por HDMI-CEC), pero explicamos por qué pueden no hacer nada.
+                    if (volumeControl == false && connection == ConnectionState.Connected) {
+                        AppCard {
+                            Icon(Icons.Outlined.Info, contentDescription = null, tint = colors.primary)
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    stringResource(R.string.remote_volume_note_title),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                                Text(
+                                    stringResource(R.string.remote_volume_note),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = colors.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -56,6 +56,11 @@
     <string name="settings_about">Acerca de</string>
 
     <string name="home_open_remote">Abrir mando</string>
+    <string name="home_add_tv">Añadir tele</string>
+    <string name="home_add_tv_body">Busca otra tele en tu wifi o escribe su IP.</string>
+    <string name="error_isolation_cause">• La tele se anuncia en la red pero no acepta conexiones del móvil. Suele pasar cuando el router aísla entre sí los aparatos conectados por wifi (aislamiento AP o de clientes) o cuando están en wifis distintas. Prueba a conectar el móvil a la misma wifi que la tele o revisa esa opción en el router.</string>
+    <string name="remote_volume_note_title">Puede que el volumen no funcione por wifi</string>
+    <string name="remote_volume_note">Este aparato no informa de un control de volumen propio: probablemente el volumen de la tele lo maneja su mando físico por infrarrojos. Si los botones de volumen no hacen nada, activa el control de volumen por HDMI-CEC en los ajustes del aparato (mando y accesorios) y en la tele.</string>
     <string name="home_tv_address">IP %1$s</string>
 
     <string name="addtv_title">Conectar tele</string>

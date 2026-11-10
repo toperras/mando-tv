@@ -17,8 +17,8 @@ import org.json.JSONObject
  * pública del certificado de la tele. La clave del mando está en el
  * AndroidKeyStore (KeyStoreIdentity).
  *
- * Versión gratuita: una tele guardada (guardar otra sustituye a la anterior).
- * La lista ya está preparada para «varias teles» de la versión Pro.
+ * Se pueden guardar varias teles. Cuando exista la versión Pro, la gratuita
+ * quedará limitada a una (decisión aplazada hasta la fase de monetización).
  */
 
 private val Context.tvStore by preferencesDataStore(name = "tvs")
@@ -28,10 +28,13 @@ class SavedTvRepository(private val context: Context) {
 
     val tvs: Flow<List<SavedTv>> = context.tvStore.data.map { prefs -> decode(prefs[tvsKey]) }
 
-    suspend fun first(): SavedTv? = tvs.first().firstOrNull()
+    suspend fun get(id: String): SavedTv? = tvs.first().firstOrNull { it.id == id }
 
+    /** Guarda la tele; si ya existía (mismo id) la actualiza y la pone la primera. */
     suspend fun save(tv: SavedTv) {
-        context.tvStore.edit { it[tvsKey] = encode(listOf(tv)) }
+        context.tvStore.edit { prefs ->
+            prefs[tvsKey] = encode(listOf(tv) + decode(prefs[tvsKey]).filterNot { it.id == tv.id })
+        }
     }
 
     suspend fun remove(id: String) {

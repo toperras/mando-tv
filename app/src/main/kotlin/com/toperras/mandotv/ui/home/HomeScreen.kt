@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.Wifi
@@ -61,12 +62,14 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    savedTv: SavedTv?,
+    savedTvs: List<SavedTv>,
     onOpenSettings: () -> Unit,
     onOpenDemo: () -> Unit,
     onConnectTv: () -> Unit,
-    onOpenRemote: () -> Unit,
+    onOpenRemote: (tvId: String) -> Unit,
 ) {
+    // La primera de la lista es la última emparejada o usada.
+    val savedTv = savedTvs.firstOrNull()
     val colors = MaterialTheme.colorScheme
     val brand = LocalBrandColors.current
     val haptics = rememberHaptics()
@@ -147,7 +150,7 @@ fun HomeScreen(
                                 .background(Color.White)
                                 .clickable(role = Role.Button) {
                                     haptics.tap()
-                                    if (savedTv != null) onOpenRemote() else onConnectTv()
+                                    if (savedTv != null) onOpenRemote(savedTv.id) else onConnectTv()
                                 }
                                 .padding(horizontal = 24.dp),
                         ) {
@@ -167,14 +170,25 @@ fun HomeScreen(
                 }
 
                 SectionTitle(stringResource(R.string.home_my_tvs))
-                if (savedTv != null) {
+                if (savedTvs.isNotEmpty()) {
+                    savedTvs.forEach { tv ->
+                        ActionTile(
+                            icon = Icons.Filled.Tv,
+                            title = tv.name,
+                            description = stringResource(R.string.home_tv_address, tv.host),
+                            onClick = { onOpenRemote(tv.id) },
+                            iconTint = colors.primary,
+                            iconBackground = colors.primaryContainer,
+                        )
+                    }
+                    // Siempre se puede buscar otra tele (otra wifi, otra habitación…).
                     ActionTile(
-                        icon = Icons.Filled.Tv,
-                        title = savedTv.name,
-                        description = stringResource(R.string.home_tv_address, savedTv.host),
-                        onClick = onOpenRemote,
+                        icon = Icons.Filled.Add,
+                        title = stringResource(R.string.home_add_tv),
+                        description = stringResource(R.string.home_add_tv_body),
+                        onClick = onConnectTv,
                         iconTint = colors.primary,
-                        iconBackground = colors.primaryContainer,
+                        iconBackground = colors.surfaceVariant,
                     )
                 } else {
                     AppCard {
