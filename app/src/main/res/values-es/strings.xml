@@ -54,4 +54,57 @@
     <string name="settings_language">Idioma</string>
     <string name="settings_language_body">La app usa el idioma de tu móvil (español o inglés).</string>
     <string name="settings_about">Acerca de</string>
+
+    <string name="home_open_remote">Abrir mando</string>
+    <string name="home_tv_address">IP %1$s</string>
+
+    <string name="addtv_title">Conectar tele</string>
+    <string name="addtv_searching">Buscando teles en tu wifi…</string>
+    <string name="addtv_found">Teles encontradas</string>
+    <string name="addtv_hint">La tele debe estar encendida y en la misma wifi que el móvil. Funciona con Android TV y Google TV (Xiaomi, Sony, TCL, Philips, Chromecast con Google TV…).</string>
+    <string name="addtv_android_tv">Android TV / Google TV</string>
+    <string name="addtv_manual">O escribe la IP</string>
+    <string name="addtv_ip_label">IP de la tele</string>
+    <string name="addtv_ip_help">En la tele: Ajustes → Red e Internet → tu red wifi.</string>
+    <string name="addtv_ip_invalid">Escribe una IP con 4 números separados por puntos, como 192.168.1.50.</string>
+    <string name="addtv_connect">Conectar</string>
+
+    <string name="pair_title">Emparejar tele</string>
+    <string name="pair_connecting">Conectando con %1$s…</string>
+    <string name="pair_code_title">Escribe el código que aparece en tu tele</string>
+    <string name="pair_code_body">Tiene 6 caracteres: números y letras de la A a la F.</string>
+    <string name="pair_code_label">Código</string>
+    <string name="pair_submit">Emparejar</string>
+    <string name="pair_wrong_code">Ese código no coincide con el de la tele. Revísalo y vuelve a intentarlo.</string>
+    <string name="pair_failed_title">No se ha podido emparejar</string>
+    <string name="pair_retry">Volver a intentar</string>
+
+    <string name="error_observed">Lo que ha visto la app</string>
+    <string name="error_causes">Posibles causas</string>
+    <string name="error_unreachable">Nadie ha respondido en %1$s.</string>
+    <string name="error_unreachable_causes">• La tele está apagada o en reposo profundo.\n• El móvil está en otra red (datos móviles, wifi de invitados).\n• La IP no es la de la tele o ha cambiado.</string>
+    <string name="error_timeout">%1$s no ha contestado a tiempo.</string>
+    <string name="error_timeout_causes">• La wifi va lenta o la tele está ocupada.\n• La IP es de un aparato que no es Android TV.</string>
+    <string name="error_rejected">La tele ha rechazado el emparejamiento.</string>
+    <string name="error_rejected_causes">• Se cerró o caducó la ventana del código en la tele.\n• Vuelve a intentarlo: la tele mostrará un código nuevo.</string>
+    <string name="error_wrong_pin">La tele no ha aceptado el código.</string>
+    <string name="error_wrong_pin_causes">• Vuelve a intentarlo: la tele mostrará un código nuevo.</string>
+    <string name="error_not_paired">La tele ya no reconoce este móvil.</string>
+    <string name="error_not_paired_causes">• La tele se ha restablecido o se borró el emparejamiento en sus ajustes.\n• Vuelve a emparejar: la tele mostrará un código nuevo.</string>
+    <string name="error_unexpected">Algo ha respondido en %1$s, pero no como una Android TV.</string>
+    <string name="error_unexpected_causes">• La IP es de otro aparato.\n• La tele usa otro sistema (Samsung, LG…), que necesita otro tipo de conexión.</string>
+    <string name="error_unknown">Error inesperado: %1$s</string>
+    <string name="error_unknown_causes">• Vuelve a intentarlo. Si sigue fallando, reinicia la tele.</string>
+
+    <string name="remote_status_idle">Desconectado</string>
+    <string name="remote_status_connecting">Conectando…</string>
+    <string name="remote_status_connected">Conectado</string>
+    <string name="remote_status_failed">Sin conexión con la tele</string>
+    <string name="remote_retry">Reintentar</string>
+    <string name="remote_repair">Volver a emparejar</string>
+    <string name="remote_lost">Se ha perdido la conexión. Comprueba que la tele siga encendida.</string>
+    <string name="remote_send_failed">No se ha podido enviar «%1$s». Revisa la conexión.</string>
+    <string name="remote_forget">Olvidar esta tele</string>
+    <string name="remote_forget_confirm">El móvil dejará de controlar %1$s. Podrás volver a emparejarla después.</string>
+    <string name="common_cancel">Cancelar</string>
 </resources>

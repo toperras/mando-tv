@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.toperras.mandotv.BuildConfig
 import com.toperras.mandotv.R
+import com.toperras.mandotv.core.SavedTv
 import com.toperras.mandotv.ui.components.ActionTile
 import com.toperras.mandotv.ui.components.AppCard
 import com.toperras.mandotv.ui.components.IconBadge
@@ -59,13 +60,18 @@ import com.toperras.mandotv.ui.theme.LocalBrandColors
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(onOpenSettings: () -> Unit, onOpenDemo: () -> Unit) {
+fun HomeScreen(
+    savedTv: SavedTv?,
+    onOpenSettings: () -> Unit,
+    onOpenDemo: () -> Unit,
+    onConnectTv: () -> Unit,
+    onOpenRemote: () -> Unit,
+) {
     val colors = MaterialTheme.colorScheme
     val brand = LocalBrandColors.current
     val haptics = rememberHaptics()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val connectSoon = stringResource(R.string.home_connect_soon)
     val lostSoon = stringResource(R.string.home_lost_soon)
 
     Box(Modifier.fillMaxSize().background(colors.background)) {
@@ -141,13 +147,17 @@ fun HomeScreen(onOpenSettings: () -> Unit, onOpenDemo: () -> Unit) {
                                 .background(Color.White)
                                 .clickable(role = Role.Button) {
                                     haptics.tap()
-                                    scope.launch { snackbar.showSnackbar(connectSoon) }
+                                    if (savedTv != null) onOpenRemote() else onConnectTv()
                                 }
                                 .padding(horizontal = 24.dp),
                         ) {
-                            Icon(Icons.Filled.Search, contentDescription = null, tint = Color(0xFF312E81))
+                            Icon(
+                                if (savedTv != null) Icons.Outlined.SportsEsports else Icons.Filled.Search,
+                                contentDescription = null,
+                                tint = Color(0xFF312E81),
+                            )
                             Text(
-                                stringResource(R.string.home_connect_tv),
+                                stringResource(if (savedTv != null) R.string.home_open_remote else R.string.home_connect_tv),
                                 color = Color(0xFF312E81),
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.titleMedium,
@@ -157,11 +167,22 @@ fun HomeScreen(onOpenSettings: () -> Unit, onOpenDemo: () -> Unit) {
                 }
 
                 SectionTitle(stringResource(R.string.home_my_tvs))
-                AppCard {
-                    IconBadge(Icons.Outlined.Tv, colors.onSurfaceVariant, colors.surfaceVariant, size = 56)
-                    Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.home_no_tvs_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(stringResource(R.string.home_no_tvs_body), style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
+                if (savedTv != null) {
+                    ActionTile(
+                        icon = Icons.Filled.Tv,
+                        title = savedTv.name,
+                        description = stringResource(R.string.home_tv_address, savedTv.host),
+                        onClick = onOpenRemote,
+                        iconTint = colors.primary,
+                        iconBackground = colors.primaryContainer,
+                    )
+                } else {
+                    AppCard {
+                        IconBadge(Icons.Outlined.Tv, colors.onSurfaceVariant, colors.surfaceVariant, size = 56)
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(R.string.home_no_tvs_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.home_no_tvs_body), style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
+                        }
                     }
                 }
 

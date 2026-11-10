@@ -55,4 +55,57 @@
     <string name="settings_language">Language</string>
     <string name="settings_language_body">The app follows your phone language (Spanish or English).</string>
     <string name="settings_about">About</string>
+
+    <string name="home_open_remote">Open remote</string>
+    <string name="home_tv_address">IP %1$s</string>
+
+    <string name="addtv_title">Connect TV</string>
+    <string name="addtv_searching">Searching for TVs on your Wi-Fi…</string>
+    <string name="addtv_found">TVs found</string>
+    <string name="addtv_hint">The TV must be on and connected to the same Wi-Fi as your phone. Works with Android TV and Google TV (Xiaomi, Sony, TCL, Philips, Chromecast with Google TV…).</string>
+    <string name="addtv_android_tv">Android TV / Google TV</string>
+    <string name="addtv_manual">Or enter the IP address</string>
+    <string name="addtv_ip_label">TV IP address</string>
+    <string name="addtv_ip_help">On the TV: Settings → Network &amp; Internet → your Wi-Fi network.</string>
+    <string name="addtv_ip_invalid">Enter an IP with 4 numbers separated by dots, like 192.168.1.50.</string>
+    <string name="addtv_connect">Connect</string>
+
+    <string name="pair_title">Pair TV</string>
+    <string name="pair_connecting">Connecting to %1$s…</string>
+    <string name="pair_code_title">Enter the code shown on your TV</string>
+    <string name="pair_code_body">It has 6 characters: numbers and letters from A to F.</string>
+    <string name="pair_code_label">Code</string>
+    <string name="pair_submit">Pair</string>
+    <string name="pair_wrong_code">That code doesn\'t match the one on the TV. Check it and try again.</string>
+    <string name="pair_failed_title">Couldn\'t pair</string>
+    <string name="pair_retry">Try again</string>
+
+    <string name="error_observed">What the app saw</string>
+    <string name="error_causes">Possible causes</string>
+    <string name="error_unreachable">Nothing answered at %1$s.</string>
+    <string name="error_unreachable_causes">• The TV is off or in deep standby.\n• The phone is on another network (mobile data, guest Wi-Fi).\n• The IP is not the TV\'s, or it changed.</string>
+    <string name="error_timeout">%1$s did not answer in time.</string>
+    <string name="error_timeout_causes">• The Wi-Fi is slow or the TV is busy.\n• The IP belongs to a device that is not an Android TV.</string>
+    <string name="error_rejected">The TV rejected the pairing.</string>
+    <string name="error_rejected_causes">• The code window on the TV was closed or timed out.\n• Try again: the TV will show a new code.</string>
+    <string name="error_wrong_pin">The TV did not accept the code.</string>
+    <string name="error_wrong_pin_causes">• Try again: the TV will show a new code.</string>
+    <string name="error_not_paired">The TV no longer recognizes this phone.</string>
+    <string name="error_not_paired_causes">• The TV was reset or the pairing was removed from its settings.\n• Pair again: the TV will show a new code.</string>
+    <string name="error_unexpected">Something answered at %1$s, but not like an Android TV.</string>
+    <string name="error_unexpected_causes">• The IP belongs to another device.\n• The TV uses a different system (Samsung, LG…), which needs another connection type.</string>
+    <string name="error_unknown">Unexpected error: %1$s</string>
+    <string name="error_unknown_causes">• Try again. If it keeps failing, restart the TV.</string>
+
+    <string name="remote_status_idle">Disconnected</string>
+    <string name="remote_status_connecting">Connecting…</string>
+    <string name="remote_status_connected">Connected</string>
+    <string name="remote_status_failed">No connection to the TV</string>
+    <string name="remote_retry">Retry</string>
+    <string name="remote_repair">Pair again</string>
+    <string name="remote_lost">Connection lost. Check that the TV is still on.</string>
+    <string name="remote_send_failed">Couldn\'t send “%1$s”. Check the connection.</string>
+    <string name="remote_forget">Forget this TV</string>
+    <string name="remote_forget_confirm">The phone will stop controlling %1$s. You can pair it again later.</string>
+    <string name="common_cancel">Cancel</string>
 </resources>

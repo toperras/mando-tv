@@ -121,6 +121,44 @@ fun ActionTile(
     }
 }
 
+/** Botón principal ancho, con icono opcional y estado «cargando». */
+@Composable
+fun PrimaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+) {
+    val haptics = rememberHaptics()
+    androidx.compose.material3.Button(
+        onClick = {
+            haptics.tap()
+            onClick()
+        },
+        enabled = enabled && !loading,
+        modifier = modifier.fillMaxWidth().heightIn(min = 56.dp),
+        shape = RoundedCornerShape(50),
+    ) {
+        if (loading) {
+            androidx.compose.material3.CircularProgressIndicator(
+                strokeWidth = 2.dp,
+                modifier = Modifier.size(20.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+            )
+        } else if (icon != null) {
+            Icon(icon, contentDescription = null)
+        }
+        Text(
+            text,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 8.dp),
+        )
+    }
+}
+
 /** Columna estándar de contenido de pantalla. */
 @Composable
 fun ScreenColumn(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
