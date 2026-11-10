@@ -1,60 +1,184 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import Constants from 'expo-constants';
-import { Platform, StyleSheet, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import {
+  ActionTile,
+  AppLogo,
+  Card,
+  HeroButton,
+  IconButton,
+  SectionTitle,
+} from '@/components/ui';
+import { Radius, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import { format, useTranslations } from '@/i18n';
 
 export default function HomeScreen() {
   const t = useTranslations();
+  const theme = useTheme();
   const version = Constants.expoConfig?.version ?? '?';
 
+  const showComingSoon = (message: string) =>
+    Alert.alert(t.common.comingSoonTitle, message, [{ text: t.common.ok }]);
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.hero}>
-          <ThemedText type="title" accessibilityRole="header">
-            {t.appName}
-          </ThemedText>
-          <ThemedText type="subtitle" style={styles.center}>
-            {t.home.welcome}
-          </ThemedText>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <ScrollView contentContainerStyle={styles.content}>
+        {/* Barra superior */}
+        <View style={styles.topBar}>
+          <View style={styles.brand}>
+            <AppLogo size={40} />
+            <ThemedText type="subtitle" accessibilityRole="header">
+              {t.appName}
+            </ThemedText>
+          </View>
+          <IconButton
+            icon="settings-outline"
+            label={t.home.settings}
+            onPress={() => router.push('/settings')}
+          />
         </View>
 
-        <ThemedView type="backgroundElement" style={styles.card}>
-          <ThemedText style={styles.center}>{t.home.phaseNotice}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary" style={styles.center}>
-            {format(t.home.deviceInfo, { platform: Platform.OS, version })}
+        {/* Tarjeta principal con degradado */}
+        <LinearGradient
+          colors={[theme.gradientStart, theme.gradientEnd]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}>
+          {/* Círculos decorativos: dan profundidad sin imágenes */}
+          <View style={[styles.bubble, styles.bubbleLarge]} />
+          <View style={[styles.bubble, styles.bubbleSmall]} />
+          <Ionicons name="wifi" size={28} color="rgba(255,255,255,0.9)" />
+          <ThemedText type="title" style={styles.heroTitle}>
+            {t.home.heroTitle}
           </ThemedText>
-        </ThemedView>
-      </SafeAreaView>
-    </ThemedView>
+          <ThemedText style={styles.heroSubtitle}>{t.home.heroSubtitle}</ThemedText>
+          <HeroButton
+            icon="search"
+            label={t.home.findTv}
+            onPress={() => showComingSoon(t.home.findTvSoon)}
+          />
+        </LinearGradient>
+
+        {/* Teles guardadas */}
+        <SectionTitle>{t.home.myTvs}</SectionTitle>
+        <Card style={styles.emptyCard}>
+          <View style={[styles.emptyIcon, { backgroundColor: theme.surfaceRaised }]}>
+            <Ionicons name="tv-outline" size={28} color={theme.textSecondary} />
+          </View>
+          <View style={styles.emptyText}>
+            <ThemedText type="defaultBold">{t.home.noTvsTitle}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              {t.home.noTvsBody}
+            </ThemedText>
+          </View>
+        </Card>
+
+        {/* Otras acciones */}
+        <SectionTitle>{t.home.more}</SectionTitle>
+        <View style={styles.tiles}>
+          <ActionTile
+            icon="game-controller-outline"
+            title={t.home.demoTitle}
+            description={t.home.demoBody}
+            onPress={() => router.push('/remote-demo')}
+          />
+          <ActionTile
+            icon="help-buoy-outline"
+            tone="warning"
+            title={t.home.lostTitle}
+            description={t.home.lostBody}
+            badge={t.common.comingSoon}
+            onPress={() => showComingSoon(t.home.lostSoon)}
+          />
+        </View>
+
+        <ThemedText type="caption" themeColor="textSecondary" style={styles.version}>
+          {format(t.home.version, { version })}
+        </ThemedText>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   safeArea: {
     flex: 1,
-    padding: Spacing.four,
-    gap: Spacing.four,
+  },
+  content: {
+    padding: Spacing.three + 4,
+    gap: Spacing.three,
+    paddingBottom: Spacing.six,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.one,
+  },
+  brand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two + 4,
   },
   hero: {
-    flex: 1,
+    borderRadius: Radius.large,
+    padding: Spacing.four,
+    gap: Spacing.two + 4,
+    overflow: 'hidden',
+    marginBottom: Spacing.two,
+  },
+  bubble: {
+    position: 'absolute',
+    borderRadius: Radius.round,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+  },
+  bubbleLarge: {
+    width: 220,
+    height: 220,
+    top: -80,
+    right: -70,
+  },
+  bubbleSmall: {
+    width: 120,
+    height: 120,
+    bottom: -50,
+    right: 60,
+  },
+  heroTitle: {
+    color: '#FFFFFF',
+  },
+  heroSubtitle: {
+    color: 'rgba(255,255,255,0.88)',
+    marginBottom: Spacing.two,
+  },
+  emptyCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
+    marginBottom: Spacing.two,
+  },
+  emptyIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: Radius.small,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: Spacing.three,
   },
-  center: {
+  emptyText: {
+    flex: 1,
+    gap: 2,
+  },
+  tiles: {
+    gap: Spacing.two + 4,
+  },
+  version: {
     textAlign: 'center',
-  },
-  card: {
-    padding: Spacing.four,
-    borderRadius: Spacing.four,
-    gap: Spacing.two,
+    marginTop: Spacing.three,
   },
 });

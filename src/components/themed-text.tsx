@@ -4,7 +4,7 @@ import { type ThemeColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ThemedTextProps = TextProps & {
-  type?: 'default' | 'title' | 'subtitle' | 'small';
+  type?: 'default' | 'defaultBold' | 'title' | 'subtitle' | 'small' | 'caption';
   themeColor?: ThemeColor;
 };
 
@@ -20,19 +20,30 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontWeight: '500',
   },
+  defaultBold: {
+    fontSize: 17,
+    lineHeight: 24,
+    fontWeight: '700',
+  },
   small: {
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '500',
   },
+  caption: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '600',
+  },
   title: {
-    fontSize: 40,
-    lineHeight: 48,
-    fontWeight: '700',
+    fontSize: 32,
+    lineHeight: 38,
+    fontWeight: '800',
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 22,
-    lineHeight: 30,
-    fontWeight: '600',
+    lineHeight: 28,
+    fontWeight: '700',
   },
 });
