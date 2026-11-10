@@ -2,6 +2,7 @@ package com.toperras.mandotv.ui.pairing
 
 import android.app.Application
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.toperras.mandotv.core.ConnectionError
@@ -53,6 +54,7 @@ class PairingViewModel(
                 session.begin()
                 _state.value = PairingUiState.AwaitingCode()
             } catch (error: Exception) {
+                Log.w(TAG, "Fallo al iniciar el emparejamiento con $host", error)
                 _state.value = PairingUiState.Failed(classifyError(error), error.message)
             }
         }
@@ -78,9 +80,14 @@ class PairingViewModel(
                 // La tele ha rechazado el código y cierra: hay que pedir otro.
                 _state.value = PairingUiState.Failed(ConnectionError.WRONG_PIN, error.message)
             } catch (error: Exception) {
+                Log.w(TAG, "Fallo al enviar el código a $host", error)
                 _state.value = PairingUiState.Failed(classifyError(error), error.message)
             }
         }
+    }
+
+    private companion object {
+        const val TAG = "MandoTV.Pairing"
     }
 
     override fun onCleared() {

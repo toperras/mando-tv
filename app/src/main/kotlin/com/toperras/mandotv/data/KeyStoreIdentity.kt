@@ -20,11 +20,14 @@ import javax.security.auth.x500.X500Principal
  */
 object KeyStoreIdentity {
     private const val KEY_STORE = "AndroidKeyStore"
-    private const val ALIAS = "mandotv_remote_identity"
+    // v2: la v1 no permitía operaciones RSA sin relleno y el TLS fallaba (ver generate()).
+    private const val ALIAS = "mandotv_remote_identity_v2"
+    private const val OLD_ALIAS = "mandotv_remote_identity"
 
     /** Lento la primera vez (genera la clave): llamar desde Dispatchers.IO. */
     fun getOrCreate(): ClientIdentity {
         val keyStore = KeyStore.getInstance(KEY_STORE).apply { load(null) }
+        if (keyStore.containsAlias(OLD_ALIAS)) keyStore.deleteEntry(OLD_ALIAS)
         if (!keyStore.containsAlias(ALIAS)) generate()
         val certificate = keyStore.getCertificate(ALIAS) as X509Certificate
         val privateKey = keyStore.getKey(ALIAS, null) as PrivateKey
@@ -51,7 +54,11 @@ object KeyStoreIdentity {
                 KeyProperties.DIGEST_SHA512,
             )
             .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1, KeyProperties.SIGNATURE_PADDING_RSA_PSS)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
+            // Conscrypt (el TLS de Android) firma con claves del KeyStore haciendo
+            // la operación RSA «en bruto» y aplicando él el relleno: sin NONE falla
+            // con «RSA routines: internal error» durante el handshake.
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE, KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
+            .setRandomizedEncryptionRequired(false)
             .build()
         KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, KEY_STORE).apply {
             initialize(spec)
