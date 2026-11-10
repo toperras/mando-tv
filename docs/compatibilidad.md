@@ -4,7 +4,8 @@ Solo se anuncia compatibilidad con lo probado en hardware real.
 
 | Tele (modelo) | Sistema | Protocolo | Móvil | Funciones probadas | Resultado | Fecha |
 |---|---|---|---|---|---|---|
-| Xiaomi Mi TV 4A 32" LED HD | Pendiente de confirmar (PatchWall o Android TV) | Xiaomi HTTP (puerto 6095) | iPhone 13 · Expo Go | Pendiente | Pendiente | — |
+| Xiaomi Mi TV 4A 32" LED HD (MiTV-MSSP2) | Android TV (Cast 3.72) | Xiaomi HTTP (puerto 6095) | PC (escaneo de puertos) | Puerto 6095 | ❌ Cerrado: este modelo no tiene el servicio | 2026-11-10 |
+| Xiaomi Mi TV 4A 32" LED HD (MiTV-MSSP2) | Android TV | Android TV Remote v2 (6466/6467) | — | Puertos abiertos | Pendiente: requiere development build | — |
 
 ## Notas por protocolo
 
