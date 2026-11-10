@@ -12,11 +12,22 @@ El prototipo Expo está archivado en `legacy-expo/`. La app es ahora Kotlin + Je
 | Textos en inglés y español | ✅ | Mi A3 en español |
 | Un gesto = una orden: toque en OK = 1; toque en VOL+ = 1; mantener VOL+ 1,5 s = 7 repeticiones; mantener CH+ = 1 | ✅ | Mi A3 (contador de la demo = 10) |
 | Interfaz `TvController`, `RemoteKey`, `ConnectionState` en `core/` | ✅ | Compila |
+| Android TV Remote v2: búsqueda mDNS, emparejamiento con código, mando, reconexión al abrir y automática tras cortes de wifi | ✅ | Google TV Streamer + Mi A3 (confirmado por el usuario en la tele) |
+| Varias teles guardadas, «Añadir tele» siempre visible | ✅ | Mi A3 |
+| Errores que separan lo observado de las causas (aislamiento del router, tele que no responde) | ✅ | Mi A3 |
 
-## Siguiente paso
-Primer adaptador real. Candidatos: Samsung de ~2011 (protocolo «legacy», puerto 55000, aceptación
-en la tele) o Android TV Remote v2 (Mi TV 4A, Google TV Streamer, DIGI). Ninguna Samsung ni LG
-respondía en la red durante el escaneo del 10/11 (probablemente estaban apagadas).
+## Dónde lo dejamos (10/11/2026, por la tarde)
+- **Mi TV 4A:** se empareja, pero tras «activar» deja de responder (sin pings). La conexión wifi entre
+  móvil y tele es muy mala (pérdida de paquetes, 2,5 s de retardo; a ratos ni el PC llega). Sospecha:
+  reposo/ahorro de wifi de la tele o aislamiento del router entre clientes wifi.
+- **Volumen en el Streamer:** no se puede por red con la configuración actual (el volumen lo cambia su
+  mando por IR directamente en la tele). Probar HDMI-CEC.
+- **Pregunta pendiente al usuario:** ¿qué app le funcionó con la Mi TV y si fue por wifi o por
+  infrarrojos? Decide el siguiente paso:
+  - Infrarrojos → añadir modo IR automático (el Mi A3 tiene emisor). Antes: fuente de códigos IR con
+    licencia compatible para una app publicada.
+  - Wifi → comparar con esa app qué hace distinto con la Mi TV.
+- Análisis de la competencia: [analisis-competencia.md](analisis-competencia.md).
 
 ## Prototipo Expo (archivado, solo referencia)
 | Parte | Resultado |
