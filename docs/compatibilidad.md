@@ -2,15 +2,19 @@
 
 Solo se anuncia compatibilidad con lo probado en hardware real.
 
-| Tele (modelo) | Sistema | Protocolo | Móvil | Funciones probadas | Resultado | Fecha |
+| Aparato (modelo) | Sistema | Protocolo | Móvil | Funciones probadas | Resultado | Fecha |
 |---|---|---|---|---|---|---|
-| Xiaomi Mi TV 4A 32" LED HD (MiTV-MSSP2) | Android TV (Cast 3.72) | Xiaomi HTTP (puerto 6095) | PC (escaneo de puertos) | Puerto 6095 | ❌ Cerrado: este modelo no tiene el servicio | 2026-11-10 |
-| Xiaomi Mi TV 4A 32" LED HD (MiTV-MSSP2) | Android TV | Android TV Remote v2 (6466/6467) | — | Puertos abiertos | Pendiente: requiere development build | — |
+| Google TV Streamer | Google TV | Android TV Remote v2 | Mi A3 (Android 11), app Kotlin | Búsqueda mDNS, emparejamiento con código, conexión, reconexión tras cerrar la app | ✅ Funciona | 2026-11-10 |
+| Google TV Streamer | Google TV | Android TV Remote v2 | Mi A3 | Toque simple, dos toques rápidos, mantener volumen | Pendiente de confirmar en la tele | — |
+| DIGI R2A | Android TV | Android TV Remote v2 | Mi A3 | Búsqueda mDNS (aparece en la lista) | ✅ Visto; sin emparejar | 2026-11-10 |
+| Xiaomi Mi TV 4A 32" (MiTV-MSSP2) | Android TV | Android TV Remote v2 | Mi A3 | Búsqueda mDNS | ✅ Visto. El móvil no llega a la tele (ARP falla): tele y móvil en wifis distintas («normal» / «Plus») | 2026-11-10 |
+| Xiaomi Mi TV 4A 32" (MiTV-MSSP2) | Android TV | Xiaomi HTTP (puerto 6095) | PC | Puerto 6095 | ❌ Cerrado: este modelo no tiene ese servicio | 2026-11-10 |
 
 ## Notas por protocolo
 
-- **Xiaomi HTTP (6095):** no documentado oficialmente; basado en pymitv. Teclas: power, flechas,
-  enter, home, back, menu, volumeup, volumedown. Sin silencio ni canales. No enciende la tele
-  si está totalmente apagada. Funciona en Expo Go.
-- **Android TV Remote v2 (6466/6467):** necesario para Xiaomi con Android TV / Google TV.
-  Requiere TLS con certificado de cliente → development build (no Expo Go).
+- **Android TV Remote v2 (6466/6467):** emparejamiento con código hexadecimal de 6 caracteres
+  y TLS con certificado de cliente. En Android, la clave del AndroidKeyStore necesita
+  `ENCRYPTION_PADDING_NONE` para que Conscrypt pueda usarla en el handshake (si no, falla con
+  «RSA routines: internal error»).
+- **Xiaomi HTTP (6095):** no documentado oficialmente (pymitv). Solo en modelos PatchWall antiguos.
+  Implementado únicamente en el prototipo Expo (`legacy-expo/`).
