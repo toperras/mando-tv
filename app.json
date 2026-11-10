@@ -1,16 +1,22 @@
 {
   "expo": {
-    "name": "mando-tv-tmp",
-    "slug": "mando-tv-tmp",
-    "version": "1.0.0",
+    "name": "Mando TV",
+    "slug": "mando-tv",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mandotvtmp",
+    "scheme": "mandotv",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "com.davidrivas.mandotv",
+      "supportsTablet": false,
+      "icon": "./assets/expo.icon",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.davidrivas.mandotv",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -20,7 +26,6 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "server",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -28,11 +33,12 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#1E6FD9",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,
