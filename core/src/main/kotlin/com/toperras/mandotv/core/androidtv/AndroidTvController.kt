@@ -51,6 +51,8 @@ class AndroidTvController(
     private var pinnedFingerprint: String?,
     private val onFirstFingerprint: (String) -> Unit,
     private val port: Int = REMOTE_PORT,
+    /** Registro de diagnóstico (en Android se conecta a Logcat). */
+    private val log: (message: String, error: Throwable?) -> Unit = { _, _ -> },
 ) : TvController {
 
     override val protocol = ProtocolId.ANDROID_TV
@@ -69,6 +71,7 @@ class AndroidTvController(
         val conn = try {
             withContext(Dispatchers.IO) { TlsConnection.open(host, port, identity, CONNECT_TIMEOUT_MS) }
         } catch (error: Exception) {
+            log("No se pudo conectar con $host:$port", error)
             _state.value = ConnectionState.Failed(classify(error, connected = false), error.message)
             return
         }
@@ -80,8 +83,9 @@ class AndroidTvController(
             return
         }
 
-        // La tele envía un ping cada pocos segundos: si en 15 s no llega nada,
-        // damos la conexión por perdida.
+        // La tele envía un ping cada ~5 s (medido con el Google TV Streamer): si en
+        // 20 s (4 pings) no llega nada, damos la conexión por perdida y la app
+        // reintenta sola.
         conn.setReadTimeout(READ_TIMEOUT_MS)
         connection = conn
         readerJob = scope.launch { readLoop(conn) }
@@ -92,6 +96,7 @@ class AndroidTvController(
         try {
             while (isActive) {
                 val message = ProtoMessage.parse(conn.receive())
+                if (!message.has(FIELD_PING_REQUEST)) log("← campos ${message.fieldNumbers}", null)
                 when {
                     message.has(FIELD_CONFIGURE) -> conn.send(RemoteMessages.configure(deviceInfo))
                     message.has(FIELD_SET_ACTIVE) -> {
@@ -112,6 +117,7 @@ class AndroidTvController(
             }
         } catch (error: Exception) {
             // Solo informamos si esta sigue siendo la conexión activa (no si la cerramos nosotros).
+            log("Conexión terminada (conectado=$connected, activa=${connection === conn})", error)
             if (connection === conn) {
                 connection = null
                 conn.close()
@@ -150,7 +156,7 @@ class AndroidTvController(
     companion object {
         const val REMOTE_PORT = 6466
         private const val CONNECT_TIMEOUT_MS = 5_000
-        private const val READ_TIMEOUT_MS = 15_000
+        private const val READ_TIMEOUT_MS = 20_000
 
         private const val FIELD_CONFIGURE = 1
         private const val FIELD_SET_ACTIVE = 2

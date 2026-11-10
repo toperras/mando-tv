@@ -100,6 +100,7 @@
     <string name="remote_status_connecting">Conectando…</string>
     <string name="remote_status_connected">Conectado</string>
     <string name="remote_status_failed">Sin conexión con la tele</string>
+    <string name="remote_status_reconnecting">Reconectando…</string>
     <string name="remote_retry">Reintentar</string>
     <string name="remote_repair">Volver a emparejar</string>
     <string name="remote_lost">Se ha perdido la conexión. Comprueba que la tele siga encendida.</string>

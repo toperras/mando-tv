@@ -65,6 +65,8 @@ fun RemoteScreen(onRepair: (host: String, name: String) -> Unit, onBack: () -> U
     val tv by vm.tv.collectAsStateWithLifecycle()
     val connection by vm.connection.collectAsStateWithLifecycle()
     val failedKey by vm.failedKey.collectAsStateWithLifecycle()
+    val reconnecting by vm.reconnecting.collectAsStateWithLifecycle()
+    val connectionLost by vm.connectionLost.collectAsStateWithLifecycle()
     val colors = MaterialTheme.colorScheme
     var confirmForget by rememberSaveable { mutableStateOf(false) }
 
@@ -99,10 +101,19 @@ fun RemoteScreen(onRepair: (host: String, name: String) -> Unit, onBack: () -> U
             ScreenColumn(Modifier.padding(bottom = 48.dp)) {
                 val current = tv
                 if (current != null) {
-                    StatusCard(connection, current.host, onRetry = vm::connect)
+                    StatusCard(connection, current.host, reconnecting, onRetry = vm::connect)
 
-                    val failed = connection as? ConnectionState.Failed
-                    if (failed != null) {
+                    val failed = (connection as? ConnectionState.Failed)?.takeUnless { reconnecting }
+                    if (failed != null && connectionLost) {
+                        // Estaba conectada y se cortó: no tiene sentido sugerir que no es una Android TV.
+                        Text(
+                            stringResource(R.string.remote_lost),
+                            color = colors.error,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    } else if (failed != null) {
                         ErrorExplanation(failed.error, current.host, failed.detail)
                         if (failed.error == ConnectionError.NOT_PAIRED) {
                             PrimaryButton(
@@ -152,13 +163,12 @@ fun RemoteScreen(onRepair: (host: String, name: String) -> Unit, onBack: () -> U
 
 /** Estado de la conexión con un punto de color. TalkBack lo anuncia al cambiar. */
 @Composable
-private fun StatusCard(state: ConnectionState, host: String, onRetry: () -> Unit) {
+private fun StatusCard(state: ConnectionState, host: String, reconnecting: Boolean, onRetry: () -> Unit) {
     val colors = MaterialTheme.colorScheme
-    val (label, dot) = when (state) {
-        ConnectionState.Connected -> stringResource(R.string.remote_status_connected) to colors.primary
-        ConnectionState.Connecting, ConnectionState.Searching -> stringResource(R.string.remote_status_connecting) to colors.onSurfaceVariant
-        is ConnectionState.Failed -> stringResource(R.string.remote_status_failed) to colors.error
-        else -> stringResource(R.string.remote_status_idle) to colors.onSurfaceVariant
+    val (label, dot) = when {
+        reconnecting && state != ConnectionState.Connected ->
+            stringResource(R.string.remote_status_reconnecting) to colors.onSurfaceVariant
+        else -> statusLabel(state)
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -176,8 +186,19 @@ private fun StatusCard(state: ConnectionState, host: String, onRetry: () -> Unit
             Text(label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(stringResource(R.string.home_tv_address, host), style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
-        if (state is ConnectionState.Failed) {
+        if (state is ConnectionState.Failed && !reconnecting) {
             TextButton(onClick = onRetry) { Text(stringResource(R.string.remote_retry), fontWeight = FontWeight.Bold) }
         }
+    }
+}
+
+@Composable
+private fun statusLabel(state: ConnectionState): Pair<String, androidx.compose.ui.graphics.Color> {
+    val colors = MaterialTheme.colorScheme
+    return when (state) {
+        ConnectionState.Connected -> stringResource(R.string.remote_status_connected) to colors.primary
+        ConnectionState.Connecting, ConnectionState.Searching -> stringResource(R.string.remote_status_connecting) to colors.onSurfaceVariant
+        is ConnectionState.Failed -> stringResource(R.string.remote_status_failed) to colors.error
+        else -> stringResource(R.string.remote_status_idle) to colors.onSurfaceVariant
     }
 }

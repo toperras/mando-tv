@@ -101,6 +101,7 @@
     <string name="remote_status_connecting">Connecting…</string>
     <string name="remote_status_connected">Connected</string>
     <string name="remote_status_failed">No connection to the TV</string>
+    <string name="remote_status_reconnecting">Reconnecting…</string>
     <string name="remote_retry">Retry</string>
     <string name="remote_repair">Pair again</string>
     <string name="remote_lost">Connection lost. Check that the TV is still on.</string>

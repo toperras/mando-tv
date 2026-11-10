@@ -2,10 +2,16 @@ package com.toperras.mandotv.ui.remote
 
 import android.app.Application
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.toperras.mandotv.BuildConfig
+import com.toperras.mandotv.core.ConnectionError
 import com.toperras.mandotv.core.ConnectionState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import com.toperras.mandotv.core.ProtocolId
 import com.toperras.mandotv.core.RemoteKey
 import com.toperras.mandotv.core.SavedTv
@@ -52,7 +58,62 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
 
     val supportedKeys: Set<RemoteKey>? get() = controller.value?.capabilities?.keys
 
+    /** true mientras la app intenta recuperar sola una conexión que se cortó. */
+    private val _reconnecting = MutableStateFlow(false)
+    val reconnecting: StateFlow<Boolean> = _reconnecting.asStateFlow()
+
+    /** true si estuvo conectada, se cortó y los reintentos automáticos no lo han arreglado. */
+    private val _connectionLost = MutableStateFlow(false)
+    val connectionLost: StateFlow<Boolean> = _connectionLost.asStateFlow()
+
     private var wantsConnection = false
+    private var wasConnected = false
+    private var reconnectJob: Job? = null
+
+    init {
+        // Reconexión automática: un corte breve de wifi (ahorro de energía del
+        // móvil, cambio de banda...) no debe obligar al usuario a pulsar nada.
+        viewModelScope.launch {
+            connection.collect { state ->
+                when (state) {
+                    ConnectionState.Connected -> {
+                        wasConnected = true
+                        _reconnecting.value = false
+                        _connectionLost.value = false
+                    }
+                    is ConnectionState.Failed -> {
+                        val recoverable = state.error != ConnectionError.NOT_PAIRED
+                        if (wantsConnection && wasConnected && recoverable) scheduleReconnect()
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
+
+    /**
+     * Reintenta con esperas crecientes (1, 2, 4 y 8 s). Cada intento espera su
+     * propio resultado: no basta con observar el estado, porque dos fallos
+     * idénticos seguidos no producen un cambio visible en el StateFlow.
+     */
+    private fun scheduleReconnect() {
+        if (reconnectJob?.isActive == true) return
+        _reconnecting.value = true
+        reconnectJob = viewModelScope.launch {
+            for (attempt in 0 until MAX_RECONNECT_ATTEMPTS) {
+                delay(1_000L shl attempt)
+                val current = controller.value ?: return@launch
+                if (!wantsConnection) return@launch
+                current.connect()
+                val result = withTimeoutOrNull(ATTEMPT_TIMEOUT_MS) {
+                    current.state.first { it == ConnectionState.Connected || it is ConnectionState.Failed }
+                }
+                if (result == ConnectionState.Connected) return@launch // el colector limpia los avisos
+            }
+            _reconnecting.value = false
+            _connectionLost.value = true
+        }
+    }
 
     init {
         viewModelScope.launch {
@@ -73,6 +134,7 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
                     onFirstFingerprint = { fingerprint ->
                         viewModelScope.launch { repository.saveFingerprint(saved.id, fingerprint) }
                     },
+                    log = { message, error -> Log.d("MandoTV.Remote", message, error) },
                 )
                 if (wantsConnection) connect()
             }
@@ -87,11 +149,17 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
 
     fun pause() {
         wantsConnection = false
+        reconnectJob?.cancel()
+        _reconnecting.value = false
         viewModelScope.launch { controller.value?.disconnect() }
     }
 
+    /** Conexión pedida por el usuario (o al abrir la pantalla): reinicia los reintentos. */
     fun connect() {
         val current = controller.value ?: return
+        reconnectJob?.cancel()
+        _reconnecting.value = false
+        _connectionLost.value = false
         viewModelScope.launch { current.connect() }
     }
 
@@ -114,6 +182,11 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
             repository.remove(saved.id)
             onDone()
         }
+    }
+
+    private companion object {
+        const val MAX_RECONNECT_ATTEMPTS = 4
+        const val ATTEMPT_TIMEOUT_MS = 12_000L
     }
 
     override fun onCleared() {
