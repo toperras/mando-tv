@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono provisional: una tele con una onda de wifi, en blanco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Pantalla -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineJoin="round"
+        android:pathData="M34,42 h40 a4,4 0 0 1 4,4 v22 a4,4 0 0 1 -4,4 h-40 a4,4 0 0 1 -4,-4 v-22 a4,4 0 0 1 4,-4 z" />
+    <!-- Peana -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M44,78 h20" />
+    <!-- Onda -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M45,34 a13,13 0 0 1 18,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,57 m-4,0 a4,4 0 1 0 8,0 a4,4 0 1 0 -8,0" />
+</vector>

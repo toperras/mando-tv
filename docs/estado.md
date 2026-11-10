@@ -1,33 +1,35 @@
 # Estado del proyecto (10/11/2026)
 
-## Hecho y verificado
+## Decisión: app nativa Android en Kotlin
+El prototipo Expo está archivado en `legacy-expo/`. La app es ahora Kotlin + Jetpack Compose
+(`app/` + `core/`). iOS, más adelante (Kotlin Multiplatform + SwiftUI o Swift).
+
+## Hecho y verificado (app Kotlin)
 | Parte | Estado | Verificado en |
 |---|---|---|
-| Fase 0: proyecto Expo SDK 58 + TypeScript + Expo Router | ✅ | iPhone 13 con Expo Go |
-| Diseño (degradado índigo-cian), tema Sistema/Claro/Oscuro, vibración | ✅ | Navegador integrado (tamaño móvil); en iPhone sin confirmar |
-| Mando de demostración con contador de pulsaciones | ✅ | Navegador integrado |
-| Interfaz `TvController` (`src/protocols/types.ts`) | ✅ | TypeScript |
-| Adaptador Xiaomi HTTP puerto 6095 + pantalla «Conectar tele» | ✅ código | Navegador (caso de error). **No sirve para la tele del usuario** |
+| Proyecto Gradle (AGP 9.5.1, Kotlin 2.4.21, Compose BOM 2026.09.00), módulos `app` y `core` | ✅ | Compila (`installDebug`) |
+| Inicio, Ajustes (tema Sistema/Claro/Oscuro y vibración en DataStore), Mando de demostración | ✅ | Mi A3 (Android 11), capturas por adb |
+| Textos en inglés y español | ✅ | Mi A3 en español |
+| Un gesto = una orden: toque en OK = 1; toque en VOL+ = 1; mantener VOL+ 1,5 s = 7 repeticiones; mantener CH+ = 1 | ✅ | Mi A3 (contador de la demo = 10) |
+| Interfaz `TvController`, `RemoteKey`, `ConnectionState` en `core/` | ✅ | Compila |
+
+## Siguiente paso
+Primer adaptador real. Candidatos: Samsung de ~2011 (protocolo «legacy», puerto 55000, aceptación
+en la tele) o Android TV Remote v2 (Mi TV 4A, Google TV Streamer, DIGI). Ninguna Samsung ni LG
+respondía en la red durante el escaneo del 10/11 (probablemente estaban apagadas).
+
+## Prototipo Expo (archivado, solo referencia)
+| Parte | Resultado |
+|---|---|
+| Fase 0 Expo SDK 58 | Abrió en iPhone 13 con Expo Go |
+| Adaptador Xiaomi HTTP puerto 6095 | No sirve para la Mi TV 4A (no tiene ese puerto) |
+| `legacy-expo/modules/tv-tls-socket` (Kotlin) | Borrador sin compilar; su lógica de AndroidKeyStore + TLS con certificado de cliente se reutilizará en `app/` |
 
 ## Descubrimiento clave
 La tele de pruebas, **Xiaomi Mi TV 4A 32" (MiTV-MSSP2, IP 192.168.1.132)**, usa **Android TV**.
 No tiene el puerto 6095. Tiene abiertos 6466/6467 (Android TV Remote v2) y 8008/8009 (Cast).
 En la red también hay un **Google TV Streamer** (.129) y un **DIGI R2A** (.128), los dos Android TV.
 → Hace falta el protocolo Android TV Remote v2, que **no funciona en Expo Go** (TLS con certificado de cliente).
-
-## A medias (sin compilar ni probar)
-`modules/tv-tls-socket/`: módulo nativo local en Kotlin para Android.
-- `ensureClientIdentity(alias)`: crea una clave RSA 2048 y un certificado autofirmado (CN=atvremote) en AndroidKeyStore y devuelve el módulo y el exponente en hexadecimal.
-- `connect(id, host, port, alias, timeoutMs)`: abre TLS con el certificado de cliente y acepta el certificado de la tele solo en ese socket. Devuelve el módulo, el exponente y la huella SHA-256 de la tele.
-- `write(id, base64)`, `close(id)`, eventos `onData` / `onClose`.
-- Pendiente: el `index.ts` del lado JS, compilarlo, y la lógica del protocolo en TypeScript.
-
-⚠️ Si se genera una build de Expo, este módulo se compilará automáticamente. Si falla, moverlo fuera de `modules/`.
-
-## Decisión pendiente
-¿Seguir con Expo (código compartido) o hacer apps nativas separadas (Kotlin para Android y,
-más adelante, Swift para iOS)? Ver la conversación del 10/11/2026. El módulo Kotlin y estas notas
-sirven en ambos casos.
 
 ## Protocolo Android TV Remote v2 (notas para implementarlo)
 Referencias: tronikos/androidtvremote2 (Python), kud/androidtv-remote (Node), AOSP pairing protocol.

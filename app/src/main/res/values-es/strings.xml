@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mando TV</string>
+
+    <string name="common_coming_soon">Próximamente</string>
+    <string name="common_back">Atrás</string>
+
+    <string name="home_settings">Ajustes</string>
+    <string name="home_hero_title">Tu tele, en tu mano</string>
+    <string name="home_hero_subtitle">Conecta tu Smart TV por wifi en segundos. Sin anuncios.</string>
+    <string name="home_connect_tv">Conectar mi tele</string>
+    <string name="home_connect_soon">La conexión con teles llegará en el siguiente paso.</string>
+    <string name="home_my_tvs">Tus teles</string>
+    <string name="home_no_tvs_title">Todavía no hay ninguna tele</string>
+    <string name="home_no_tvs_body">Cuando conectes tu tele aparecerá aquí para volver a usarla con un toque.</string>
+    <string name="home_more">Más opciones</string>
+    <string name="home_demo_title">Probar el mando</string>
+    <string name="home_demo_body">Mira cómo es el mando antes de conectar tu tele.</string>
+    <string name="home_lost_title">He perdido el mando</string>
+    <string name="home_lost_body">Ayuda paso a paso para emparejar sin el mando físico.</string>
+    <string name="home_lost_soon">Esta ayuda llegará en una fase posterior.</string>
+    <string name="home_version">Versión %1$s</string>
+
+    <string name="remote_title">Mando</string>
+    <string name="remote_demo_banner">Modo demostración: los botones no envían nada a la tele.</string>
+    <string name="remote_last_key">Última tecla: %1$s</string>
+    <string name="remote_no_key_yet">Pulsa cualquier botón</string>
+    <string name="remote_press_count">Pulsaciones: %1$d</string>
+    <string name="remote_volume">VOL</string>
+    <string name="remote_channel">CH</string>
+    <string name="key_power">Encender o apagar</string>
+    <string name="key_up">Arriba</string>
+    <string name="key_down">Abajo</string>
+    <string name="key_left">Izquierda</string>
+    <string name="key_right">Derecha</string>
+    <string name="key_ok">Aceptar</string>
+    <string name="key_back">Atrás</string>
+    <string name="key_home">Inicio</string>
+    <string name="key_menu">Menú</string>
+    <string name="key_mute">Silencio</string>
+    <string name="key_volume_up">Subir volumen</string>
+    <string name="key_volume_down">Bajar volumen</string>
+    <string name="key_channel_up">Canal siguiente</string>
+    <string name="key_channel_down">Canal anterior</string>
+
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_appearance">Apariencia</string>
+    <string name="settings_theme_system">Sistema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_feedback">Respuesta al pulsar</string>
+    <string name="settings_haptics">Vibración</string>
+    <string name="settings_haptics_body">Vibra ligeramente con cada pulsación.</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_body">La app usa el idioma de tu móvil (español o inglés).</string>
+    <string name="settings_about">Acerca de</string>
+</resources>

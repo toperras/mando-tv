@@ -1,37 +1,47 @@
 # Entorno y stack para esta app
 
+> **Cambio de rumbo (10/11/2026):** el prototipo Expo/React Native está archivado en
+> `legacy-expo/` (solo como referencia). La app se desarrolla ahora **nativa para Android en
+> Kotlin**. iOS queda para más adelante (Kotlin Multiplatform + SwiftUI, o Swift), cuando haya
+> acceso a un Mac y a la cuenta de Apple. Motivo: casi todo lo importante es nativo (Android TV
+> Remote v2 con TLS, mDNS, Wake-on-LAN, infrarrojos, widgets) y Expo Go no lo permite.
+> Donde el texto de abajo hable de Expo, React Native o TypeScript, aplica el stack nuevo.
+
 ## Mi entorno
 - Desarrollo en Windows 11, sin Mac. No uses Xcode, CocoaPods ni comandos que requieran macOS.
-- Pruebo en un iPhone 13 físico con la app Expo Go (misma red WiFi que el PC).
-- Uso PowerShell como terminal.
+- Pruebo en un **Xiaomi Mi A3 con Android 11** conectado por USB (depuración USB activa).
+  También tengo un iPhone 13 (para la futura versión iOS).
+- Teles y aparatos de prueba: Xiaomi Mi TV 4A 32" (Android TV), Samsung de ~2011, una LG,
+  Fire TV, Chromecast, Google TV Streamer y un descodificador DIGI R2A (Android TV).
+- Uso PowerShell como terminal. Tengo Android Studio instalado.
 
 ## Stack obligatorio
-- React Native con Expo (SDK más reciente estable) y TypeScript.
-- Navegación con Expo Router.
-- Usa solo librerías compatibles con Expo Go mientras sea posible. Si una función necesita
-  código nativo que Expo Go no soporta, avísame antes y propón usar un "development build"
-  con EAS en vez de hacer "expo prebuild" o "expo run:ios".
-- Instala dependencias con "npx expo install" (no npm install a secas) para que las
-  versiones sean compatibles con el SDK.
+- Kotlin + Jetpack Compose (Material 3), Gradle con catálogo de versiones (`gradle/libs.versions.toml`).
+- Versiones alineadas con mi otro proyecto `C:\limpiador-altavoz` (AGP 9.5.1, Kotlin 2.4.21,
+  Gradle 9.6.0, Compose BOM 2026.09.00). AGP 9 compila Kotlin por sí mismo.
+- minSdk 26, targetSdk 36, compileSdk 37. Paquete `com.toperras.mandotv`.
+- Módulos: `:app` (pantallas y todo lo de Android) y `:core` (modelo del mando y protocolos en
+  Kotlin puro, **sin importar android.\***, para poder migrarlo a Kotlin Multiplatform).
+- Textos en `res/values` (inglés) y `res/values-es` (español). Nada de textos fijos en el código.
 
 ## Flujo de trabajo
-1. Crear el proyecto con: npx create-expo-app@latest <nombre> --template
-2. Probar en local con: npx expo start  (si el iPhone no conecta, usar --tunnel)
-3. Compilar para iOS en la nube con EAS Build: eas build --platform ios
-4. Publicar en App Store / TestFlight con: eas submit --platform ios
-- Configura eas.json con perfiles development, preview y production.
-- Configura app.json con nombre, bundleIdentifier (com.<mi-nombre>.<app>), icono y splash.
+1. Compilar e instalar en el móvil por USB (desde `C:\apps\mando-tv`):
+   `$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; .\gradlew.bat :app:installDebug`
+   (o abrir la carpeta en Android Studio y pulsar Run).
+2. Capturas del móvil desde el PC: `adb shell screencap` + `adb pull` (adb está en
+   `%LOCALAPPDATA%\Android\Sdk\platform-tools`).
+3. Publicación en Google Play con un App Bundle firmado (`bundleRelease`), cuando toque.
 
 ## Cómo quiero que trabajes
 - Antes de programar, resúmeme en pocas líneas qué pantallas y funciones vas a hacer.
-- Construye la app en pasos pequeños que pueda probar en el iPhone tras cada uno.
+- Construye la app en pasos pequeños que pueda probar en el móvil tras cada uno.
 - Dime exactamente qué comando ejecutar y qué debería ver en el móvil.
 - Explica en español y de forma sencilla; no soy experto.
-- Si algo requiere cuenta de pago (Apple Developer 99 $/año, plan EAS de pago), avísame antes.
+- Si algo requiere cuenta de pago (Google Play 25 $ una vez, Apple Developer 99 $/año), avísame antes.
 
-# Migración a android
+# Migración a iOS
 
-- La aplicación podrá migrarse a android en un futuro, prioriza esto a la hora de programar.
+- La app podrá llevarse a iOS en el futuro: mantén la lógica de protocolos en `:core`, sin dependencias de Android.
 
 ## La app que quiero
 
